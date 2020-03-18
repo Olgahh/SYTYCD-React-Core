@@ -15,18 +15,18 @@ const instance = axios.create({
 
 class App extends Component {
   state = {
-    authors: null,
+    authors: [],
     books: [],
-    loading: false
+    loading: true //loading =true untill the data is loaded
   };
 
   fetchAllAuthors = async () => {
-    const res = await instance.put("/api/authors/");
+    const res = await instance.get("/api/authors/"); //get not put
     return res.data;
   };
 
   fetchAllBooks = async () => {
-    const res = await instance.get("/-api/books/");
+    const res = await instance.get("/api/books/"); // removed  - from -api
     return res.data;
   };
 
@@ -35,6 +35,12 @@ class App extends Component {
       const authors = await this.fetchAllAuthors();
       const books = await this.fetchAllBooks();
 
+      this.setState({
+        authors: authors,
+        books: books,
+        loading: false
+      });
+
       /**
        * Alternatives: this version would run in parallel!
        */
@@ -42,12 +48,6 @@ class App extends Component {
       // const booksReq = this.fetchAllBooks();
       // const authors = await authorsReq;
       // const books = await booksReq;
-
-      this.setState({
-        authors: authors,
-        books: books,
-        loading: false
-      });
     } catch (err) {
       console.error(err);
     }
@@ -60,7 +60,8 @@ class App extends Component {
       return (
         <Switch>
           <Redirect exact from="/" to="/authors" />
-          <Route path="/authors/:ID" component={AuthorDetail} />
+          <Route path="/authors/:authorID" component={AuthorDetail} />
+          {/* // same name as match.param  */}
           <Route
             path="/authors/"
             render={props => (
